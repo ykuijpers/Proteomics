@@ -1,0 +1,60 @@
+---
+title: "Proteomics"
+author: "Mark A. Grannetia and Yunus Kuijpers"
+date: "1 mei 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+require("knitr")
+opts_knit$set(root.dir = 'C:/Users/yunus/Downloads/B4TM/Proteomics/')
+```
+
+#Question1.1
+
+Include a figure of the full spectrum, plotting mass over charge on the x axis, versus intensity on the y axis.
+
+```{r Question 1.1, include=TRUE} 
+MaldSpec <- read.delim('maldi-spectrum.tsv', header = TRUE) 
+plot(MaldSpec, xlim = c(750, 4000), ylim = c(0, 80000), xlab = 'mass (m/z)', ylab = 'intensity (counts)', main = 'Complete Maldi-spectrum', type="l")
+```
+
+#Question1.2
+
+Consider a peptide with chemical formula C80H128N24O22. What monoisotopic mass do you expect this peptide to have? At what mass over charge does the first big peak actually show up? Why? (Hint: Look up how peptides are treated for MALDI mass spectrometry.)
+
+Include the same figure as for question 1.1, but zoom in on the mass over charge range where the peptide's first five isotopes should show up. Indicate the position of these five isotopes with vertical lines.
+
+```{r Question 1.2, include=TRUE}
+RangeIsotopes <- c(1777.964, 1778.964, 1779.964, 1780.964, 1781.964)
+LineColours <- c("red", "blue", "green", "purple", "orange")
+plot(MaldSpec, xlim = c(1777, 1783), ylim = c(0, 1200), xlab = 'mass (m/z)', ylab = 'intensity (counts)', main = 'Maldi-spectrum around target peptide', type="l")
+abline(v=RangeIsotopes, col=LineColours)
+#voeg legend toe
+#eerste piek is ongeveer 1062.43
+```
+
+We expect the monoisotopic mass of the target peptide C80H128N24O22 to be 1776.964 u, but we can see the first peak around this region at 1778 m/z. This is because the peptide gets ionized and gains a weight of 1 u resulting in a peak at a higher m/z than initially expected.
+
+
+#Question 1.3
+
+Consider the natural abundance of the two most stable isotopes of carbon, and only those isotopes. What relative intensities would you expect for an isotope spectrum of C80H128N24O22?
+
+Include a figure comparing your expected intensities with the observed data. Briefly discuss any discrepancies, and explain where they come from. (Hint: What does this tool do differently compared to your binomial model?)
+
+```{r Question 1.3, include=TRUE}
+#carbon-12 has a probability of 98.9
+#carbon-13 has a probability of 1.1
+
+C13 <- dbinom(1:5, size=80, prob= 0.011)
+ratio_C13 <- C13/C13[1] #ratio van de kansen ten opzichte van de eerste kans, maybe is dit niet de juiste keuze though
+intensityC13 <- ratio_C13 * 1062.43 
+
+
+plot(MaldSpec, xlim = c(1777, 1783), ylim = c(0, 1200), xlab = 'mass (m/z)', ylab = 'intensity (counts)', main = 'Maldi-spectrum around target peptide', type="l")
+abline(v=RangeIsotopes, col=LineColours)
+points(RangeIsotopes, intensityC13, type = "p")
+
+```
